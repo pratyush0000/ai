@@ -52,70 +52,131 @@ def drawwindow():
     pygame.display.update()
 
 def check_winner():
-    # Check rows, columns, and diagonals for a win
     for i in range(3):
-        # Check rows and columns
         if grid[i][0] == grid[i][1] == grid[i][2] and grid[i][0] is not None:
             return grid[i][0]
         if grid[0][i] == grid[1][i] == grid[2][i] and grid[0][i] is not None:
             return grid[0][i]
     
-    # Check diagonals
     if grid[0][0] == grid[1][1] == grid[2][2] and grid[0][0] is not None:
         return grid[0][0]
     if grid[0][2] == grid[1][1] == grid[2][0] and grid[0][2] is not None:
         return grid[0][2]
     
-    # Check if the board is full (draw)
     for row in grid:
         if None in row:
             return None  # Continue game if there are empty cells
     
     return "Draw"  # Board is full and no winner
 
+def minimax(is_maximizing, alpha, beta):
+    winner = check_winner()
+    if winner == "X":
+        return -1  # X is the human player, so we minimize this score
+    elif winner == "O":
+        return 1   # O is the AI player, so we maximize this score
+    elif winner == "Draw":
+        return 0   # Draw has a neutral score
+
+    if is_maximizing:
+        best_score = -float('inf')
+        for row in range(3):
+            for col in range(3):
+                if grid[row][col] is None:
+                    grid[row][col] = "O"
+                    score = minimax(False, alpha, beta)
+                    grid[row][col] = None
+                    best_score = max(best_score, score)
+                    alpha = max(alpha, score)
+                    if beta <= alpha:
+                        break
+        return best_score
+    else:
+        best_score = float('inf')
+        for row in range(3):
+            for col in range(3):
+                if grid[row][col] is None:
+                    grid[row][col] = "X"
+                    score = minimax(True, alpha, beta)
+                    grid[row][col] = None
+                    best_score = min(best_score, score)
+                    beta = min(beta, score)
+                    if beta <= alpha:
+                        break
+        return best_score
+
+def ai_move():
+    best_score = -float('inf')
+    best_move = None
+    for row in range(3):
+        for col in range(3):
+            if grid[row][col] is None:
+                grid[row][col] = "O"
+                score = minimax(False, -float('inf'), float('inf'))
+                grid[row][col] = None
+                if score > best_score:
+                    best_score = score
+                    best_move = (row, col)
+    if best_move:
+        grid[best_move[0]][best_move[1]] = "O"
+
 def handle_click(pos):
-    global current_turn, x_wins, o_wins, grid
+    global current_turn, x_wins, o_wins
 
     x, y = pos
     row, col = y // CELL_SIZE, x // CELL_SIZE
-    
-    # Check if the cell is empty before placing X or O
     if row < 3 and col < 3 and grid[row][col] is None:
         grid[row][col] = current_turn
-        winner = check_winner()
-        
-        if winner:
-            if winner == "X":
-                x_wins += 1
-            elif winner == "O":
-                o_wins += 1
-            return True  # Indicate a win happened
-        else:
-            # Toggle between X and O if there’s no winner yet
-            current_turn = "O" if current_turn == "X" else "X"
-    
-    return False  # No win
+        return True  # Return true if the move is successful
+    return False
 
 def reset_board():
     global grid, current_turn
     grid = [[None, None, None], [None, None, None], [None, None, None]]
-    current_turn = "X"  # Reset to X as the starting turn
+    current_turn = "X"
 
 def main():
+    global current_turn, x_wins, o_wins  # Declare x_wins and o_wins as global
     clock = pygame.time.Clock()
     run = True
     while run:
         clock.tick(FPS)
-        drawwindow()  # Always update the display each frame
+        drawwindow()
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 run = False
-            elif event.type == pygame.MOUSEBUTTONDOWN:
+            elif event.type == pygame.MOUSEBUTTONDOWN and current_turn == "X":
                 if handle_click(pygame.mouse.get_pos()):
-                    drawwindow()  # Update display to show the win before delay
-                    pygame.time.delay(3000)  # Delay for 3 seconds after a win
-                    reset_board()  # Reset the board after displaying the win
+                    winner = check_winner()
+                    drawwindow()
+                    pygame.time.delay(1000)  # Delay for 1 second before AI move
+                    
+                    if winner:  # Check if there's a winner after the player's move
+                        if winner == "X":
+                            x_wins += 1
+                        elif winner == "O":
+                            o_wins += 1
+                        drawwindow()
+                        pygame.time.delay(3000)  # Show the winning board
+                        reset_board()
+                    else:
+                        current_turn = "O"  # Switch to AI's turn
 
+            if current_turn == "O":
+                ai_move()  # AI makes its move
+                winner = check_winner()  # Check for a winner after AI's move
+                drawwindow()  # Show the updated board after AI's move
+                
+                if winner:
+                    if winner == "X":
+                        x_wins += 1
+                    elif winner == "O":
+                        o_wins += 1
+                    drawwindow()
+                    pygame.time.delay(3000)  # Show the winning board
+                    reset_board()
+                else:
+                    current_turn = "X"  # Switch back to player turn after AI move
     pygame.quit()
 
 if __name__ == "__main__":
