@@ -61,41 +61,43 @@ o_wins = 0
 
 
 def start():
-    START = False  # Initialize START as False
+    START = False
     run = True
 
     while run:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                run = False
+                pygame.quit()  # Quit gracefully if the user exits the window
+                return  # Ensure it exits the loop immediately
 
         WIN.blit(REAL_BG, (0, 0))
-        WIN.blit(TITLE_IMG, (WIDTH//2 - TITLE_IMG.get_width()//2 - 10, HEIGHT//4 - TITLE_IMG.get_height()//2))
-        WIN.blit(COPYRIGHT, (WIDTH//2 - COPYRIGHT.get_width()//2 - 10, HEIGHT - COPYRIGHT.get_height() - 10))
+        WIN.blit(TITLE_IMG, (WIDTH // 2 - TITLE_IMG.get_width() // 2 - 10, HEIGHT // 4 - TITLE_IMG.get_height() // 2))
+        WIN.blit(COPYRIGHT, (WIDTH // 2 - COPYRIGHT.get_width() // 2 - 10, HEIGHT - COPYRIGHT.get_height() - 10))
 
-        if START_BUTTON.draw(WIN):  # START button to transition to level selection
+        if START_BUTTON.draw(WIN):
             pygame.time.delay(300)
             START = True
-            break  # Exit to begin difficulty selection
+            break  # Proceed to level select
 
         if QUIT_BUTTON.draw(WIN):
             pygame.time.delay(550)
-            run = False
+            pygame.quit()  # Quit Pygame
+            return  # Exit function immediately to avoid further screen updates
 
         pygame.display.update()
 
     if START:
-        levelselect()  # Call levelselect() after START button is clicked
-
+        levelselect()
 
 def levelselect():
     run = True
-    difficulty_selected = None  # Track if difficulty is selected
+    difficulty_selected = None
 
     while run and not difficulty_selected:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                run = False
+                pygame.quit()
+                return  # Exit the function
 
         WIN.blit(REAL_BG, (0, 0))
 
@@ -111,15 +113,13 @@ def levelselect():
     if difficulty_selected:
         main(difficulty_selected)
 
-
 def drawwindow():
-    #WIN.fill(RED)
-    WIN.blit(REAL_BG,(0,0))
+    WIN.blit(REAL_BG, (0, 0))
 
     # Draw the Tic Tac Toe grid lines
     for i in range(1, 3):
-        pygame.draw.rect(WIN, WHITE, (BOARD_X + i * CELL_SIZE - 5, BOARD_Y, 10, BOARD_SIZE))  # Vertical lines
-        pygame.draw.rect(WIN, WHITE, (BOARD_X, BOARD_Y + i * CELL_SIZE - 5, BOARD_SIZE, 10))  # Horizontal lines
+        pygame.draw.rect(WIN, WHITE, (BOARD_X + i * CELL_SIZE - 5, BOARD_Y, 10, BOARD_SIZE))
+        pygame.draw.rect(WIN, WHITE, (BOARD_X, BOARD_Y + i * CELL_SIZE - 5, BOARD_SIZE, 10))
 
     # Draw X and O based on the grid state
     for row in range(3):
@@ -136,10 +136,9 @@ def drawwindow():
     WIN.blit(o_counter_text, (WIDTH - o_counter_text.get_width() - 50, HEIGHT - 80))
 
     if MENU_BUTTON.draw(WIN):
-            pygame.time.delay(550)
-            reset_board()
-            start()
-
+        pygame.time.delay(550)
+        reset_board()
+        start()  # Re-enter the start screen after resetting the board
 
     pygame.display.update()
 
