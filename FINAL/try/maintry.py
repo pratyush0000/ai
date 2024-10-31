@@ -30,6 +30,10 @@ MEDIUM_BUTTON = button.Button(WIDTH//2-MEDIUM_IMG.get_width()//2, 350-MEDIUM_IMG
 HARD_IMG = pygame.transform.scale(pygame.image.load("Assets/hardbutton.png").convert_alpha(),(300,112))
 HARD_BUTTON = button.Button(WIDTH//2-HARD_IMG.get_width()//2, 550-HARD_IMG.get_height()//4,HARD_IMG,1)
 
+#gamepage
+MENU_IMG = pygame.transform.scale(pygame.image.load("Assets/menubutton.png").convert_alpha(),(150,56))
+MENU_BUTTON = button.Button(WIDTH//2-MENU_IMG.get_width()//2, HEIGHT - MENU_IMG.get_height() - 35 ,MENU_IMG,1)
+
 
 # fps
 FPS = 60
@@ -130,6 +134,12 @@ def drawwindow():
     o_counter_text = COUNTER_FONT.render(f"O Wins: {o_wins}", True, WHITE)
     WIN.blit(x_counter_text, (50, HEIGHT - 80))
     WIN.blit(o_counter_text, (WIDTH - o_counter_text.get_width() - 50, HEIGHT - 80))
+
+    if MENU_BUTTON.draw(WIN):
+            pygame.time.delay(550)
+            reset_board()
+            start()
+
 
     pygame.display.update()
 
