@@ -1,7 +1,7 @@
 import pygame
 import button
 pygame.font.init()
-from hardtry import hard_move  
+from hardnottry import hard_move  
 from easytry import easy_move
 from mediumtry import medium_move
 from winnertry import check_winner  # Import check_winner from winner.py
