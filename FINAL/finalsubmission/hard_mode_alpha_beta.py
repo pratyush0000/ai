@@ -5,9 +5,9 @@ from check_winner import check_winner  # Import check_winner from winner.py
 def minimax(grid, is_maximizing, alpha, beta):
     winner = check_winner(grid)
     if winner == "X":
-        return -1  # X is the human player, so we minimize this score
+        return -10  # X is the human player, so we minimize this score
     elif winner == "O":
-        return 1   # O is the AI player, so we maximize this score
+        return 10   # O is the AI player, so we maximize this score
     elif winner == "Draw":
         return 0   # Draw has a neutral score
 
